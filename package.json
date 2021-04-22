@@ -4,8 +4,14 @@
   "description": "Api for 247 Web Application",
   "main": "index.js",
   "scripts": {
-    "start": "export NODE_ENV=dev NODE_CONFIG_DIR=./src/config/ && nodemon -w src --exec \"babel-node src/app.js --presets es2015\"",
-    "test": "export NODE_ENV=test NODE_CONFIG_DIR=./src/config/ && mocha --timeout 10000 --compilers js:babel-core/register ./src/test/*.js "
+    "dev": "export NODE_ENV=dev NODE_CONFIG_DIR=./src/config/ && nodemon -w src --exec \"babel-node src/app.js --presets es2015\"",
+    "clean": "rm -rf build && mkdir build",
+    "build-server": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-server",
+    "lint": "eslint source/ --quiet",
+    "start": "export NODE_ENV=dev NODE_CONFIG_DIR=./build/config/ && node ./build/app.js",
+    "test": "for i in $(ls tests/); do babel-node \"./tests/${i}\" | faucet ; done",
+    "validate": "npm run lint; npm run test && npm outdated --depth 0"
   },
   "author": "247",
   "license": "ISC",
