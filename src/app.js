@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+import numCPUs from 'os';
 import express from 'express';
 import morgan from 'morgan';
 import jwt from 'jsonwebtoken';
@@ -16,8 +18,24 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/', routes);
 
+const cpu = numCPUs.cpus().length
 const port = process.env.PORT || config.server.port;
-app.listen(port);
-console.log('Node + Express REST API skeleton server started on port: ' + port);
+
+if (cluster.isMaster) {
+  console.log('Express REST API started on port: ' + port + `, Primary ${process.pid} started`);
+
+  // Fork workers.
+  for (let i = 0; i < cpu; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {  
+  app.listen(port);
+
+  console.log('Express REST API started on port: ' + port + `, Worker ${process.pid} started`);
+}
 
 module.exports = app;
