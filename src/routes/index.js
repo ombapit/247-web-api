@@ -1,22 +1,15 @@
-import express from 'express';
-
-// import auth from './auth';
-// import users from './users';
 import response from '../helpers/response';
 
-const routes  = express.Router();
+module.exports = function(router){
+  router.use(response.setHeadersForCORS);
 
-routes.use(response.setHeadersForCORS);
+  router.get('/', (req, res) => {
+    res.status(200).json({ message: 'Ok' });
+  });
 
-// routes.use('/', auth);
-// routes.use('/users', users);
+  router.use(function(req, res) {
+    response.sendNotFound(res);
+  });
 
-routes.get('/', (req, res) => {
-  res.status(200).json({ message: 'Ok' });
-});
-
-routes.use(function(req, res) {
-  response.sendNotFound(res);
-});
-
-module.exports = routes;
+	return router;
+}

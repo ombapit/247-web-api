@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 import numCPUs from 'os';
+import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
 import jwt from 'jsonwebtoken';
@@ -9,16 +10,16 @@ import jwt from 'jsonwebtoken';
 
 import config from 'config';
 // import db from './db/db';
-import routes from './routes';
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
-app.use('/', routes);
+app.use(require('expressjs.routes.autoload')(path.join(__dirname, './routes'), true));
 
-const cpu = numCPUs.cpus().length
+// const cpu = numCPUs.cpus().length
+const cpu = 1
 const port = process.env.PORT || config.server.port;
 
 if (cluster.isMaster) {
